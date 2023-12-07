@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from account.models import User
 from account.serializers import UserSerializer
 
-from .forms import PostForm
+from .forms import PostForm, AttachmentForm
 from .models import Post, Like, Comment, Trend
 from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer, TrendSerializer
 
@@ -49,11 +49,21 @@ def post_list_profile(req, id):
 @api_view(['POST'])
 def post_create(req):
   form = PostForm(req.data)
+  attachment = None
+  attachment_form = AttachmentForm(req.POST, req.FILES)
+
+  if attachment_form.is_valid():
+    attachment = attachment_form.save(commit=False)
+    attachment.created_by = req.user
+    attachment.save()
 
   if form.is_valid():
     post = form.save(commit=False)
     post.created_by = req.user
     post.save()
+
+    if attachment:
+      post.attachment.add(attachment)
 
     user = req.user
     user.posts_count = user.posts_count + 1

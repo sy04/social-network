@@ -13,8 +13,16 @@
     <p class="text-gray-600">{{ post.created_at_formatted }} ago</p>
   </div>
 
+  <template v-if="post.attachment.length">
+    <img
+      v-for="image in post.attachment"
+      v-bind:key="image.id"
+      :src="image.get_image"
+      class="w-full mb-4 rounded-xl"
+    />
+  </template>
+
   <p>{{ post.body }}</p>
-  <!-- <img src="https://images.unsplash.com/photo-1661956602868-6ae368943878?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2670&q=80" class="w-full rounded-lg"> -->
 
   <div class="my-6 flex justify-between">
     <div class="flex space-x-6">
