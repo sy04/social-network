@@ -21,7 +21,7 @@ for user in users:
 
   print('Find friends for:', user)
 
-  for friend in user.friends:
+  for friend in user.friends.all():
     print('Is friend with:', friend)
 
     for friendsfriend in friend.friends.all():

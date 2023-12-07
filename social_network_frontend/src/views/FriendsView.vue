@@ -50,7 +50,7 @@
           v-for="user in friends"
           v-bind:key="user.id"
         >
-          <img :src="user.created_by.get_avatar" class="mb-6 rounded-full">
+          <img :src="user.get_avatar" class="mb-6 rounded-full">
           <p>
             <strong>
               <RouterLink :to="{name: 'profile', params: {'id': user.id}}">

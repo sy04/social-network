@@ -14,7 +14,7 @@
           <button
             class="inline-block py-5 px-3 bg-purple-600 text-xs text-white rounded-lg"
             @click="sendFriendshipRequest"
-            v-if="userStore.user.id !== user.id"
+            v-if="userStore.user.id !== user.id && cant_send_friendship_request"
           >
             Send Friendship Request
           </button>
@@ -128,6 +128,7 @@ input[type='file'] {
         user: {
           id: ''
         },
+        cant_send_friendship_request: null,
         body: '',
         url: null
       }
@@ -163,7 +164,7 @@ input[type='file'] {
         axios
           .post(`/api/friends/${this.$route.params.id}/request/`)
           .then((res) => {
-            console.log('data', res.data)
+            this.cant_send_friendship_request = false
             if(res.data.message === 'request already sent') {
                 this.toastStore.showToast(5000, 'The request has already been sent!', 'bg-red-300')
             } else {
@@ -180,6 +181,7 @@ input[type='file'] {
           .then((res) => {
             this.posts = res.data.posts
             this.user = res.data.user
+            this.cant_send_friendship_request = res.data.cant_send_friendship_request
           })
           .catch((err) => {
             console.log('error', err.message)

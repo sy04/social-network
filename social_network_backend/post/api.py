@@ -9,6 +9,8 @@ from .forms import PostForm, AttachmentForm
 from .models import Post, Like, Comment, Trend
 from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer, TrendSerializer
 
+from account.models import FriendshipRequest
+
 @api_view(['GET'])
 def post_list(req):
   user_ids = [req.user.id]
@@ -42,9 +44,21 @@ def post_list_profile(req, id):
   post_serialiazer = PostSerializer(posts, many=True)
   user_serialiazer = UserSerializer(user)
 
+  cant_send_friendship_request = True
+
+  if req.user in user.friends.all():
+    cant_send_friendship_request = False
+
+  check1 = FriendshipRequest.objects.filter(created_for=req.user).filter(created_by=user)
+  check2 = FriendshipRequest.objects.filter(created_for=user).filter(created_by=req.user)
+
+  if check1 or check2:
+    cant_send_friendship_request = False
+
   return JsonResponse({
       'posts': post_serialiazer.data,
-      'user': user_serialiazer.data
+      'user': user_serialiazer.data,
+      'cant_send_friendship_request': cant_send_friendship_request
     }, safe=False)
 
 @api_view(['POST'])

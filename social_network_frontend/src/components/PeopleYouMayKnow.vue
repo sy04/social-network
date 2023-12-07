@@ -1,5 +1,8 @@
 <template>
-  <div class="p-4 bg-white border border-gray-200 rounded-lg">
+  <div
+    class="p-4 bg-white border border-gray-200 rounded-lg"
+    v-if="users.length"
+  >
     <h3 class="mb-6 text-xl">People you may know</h3>
     <div class="space-y-4">
       <div
@@ -19,7 +22,7 @@
 
 <script>
   import axios from 'axios';
-import { RouterLink } from 'vue-router';
+  import { RouterLink } from 'vue-router';
 
   export default {
     data() {
