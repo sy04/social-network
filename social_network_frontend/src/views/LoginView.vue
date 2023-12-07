@@ -81,7 +81,7 @@ import { RouterLink } from 'vue-router';
             })
             .catch((err) => {
               console.log('error', err)
-              this.errors.push('The email or password is incorrect!')
+              this.errors.push('The email or password is incorrect! or the user is not activated!')
             })
         }
 
