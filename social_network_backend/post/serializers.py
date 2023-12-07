@@ -12,7 +12,7 @@ class PostSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = Post
-    fields = ('id', 'body', 'likes_count', 'comments_count', 'created_by', 'created_at_formatted', 'attachment')
+    fields = ('id', 'body', 'is_private', 'likes_count', 'comments_count', 'created_by', 'created_at_formatted', 'attachment')
 
 class CommentSerializer(serializers.ModelSerializer):
   created_by = UserSerializer(read_only=True)
