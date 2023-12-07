@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
+from notification.utils import create_notification
 from .forms import SignupForms, ProfileForms
 from .models import User, FriendshipRequest
 from .serializers import UserSerializer, FriendshipRequestSerializer
@@ -111,7 +112,10 @@ def send_friendship_request(req, pk):
   check2 = FriendshipRequest.objects.filter(created_for=user).filter(created_by=req.user)
 
   if not check1 and not check2:
-    FriendshipRequest.objects.create(created_for = user, created_by = req.user)
+    friendrequest = FriendshipRequest.objects.create(created_for = user, created_by = req.user)
+
+    notification = create_notification(req, 'new_friendrequest', friendrequest_id=friendrequest.id)
+
     return JsonResponse({'message': 'friendship request created'})
   else:
     return JsonResponse({'message': 'request already sent'})
@@ -131,5 +135,7 @@ def handle_request(req, pk, status):
     request_user = req.user
     request_user.friends_count = request_user.friends_count + 1
     request_user.save()
+
+    notification = create_notification(req, 'accepted_friendrequest', friendrequest_id=friendship_request.id)
 
   return JsonResponse({'message': 'friendship request updated'})
