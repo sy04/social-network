@@ -23,6 +23,11 @@
             <input type="email" v-model="form.email" placeholder="Your e-mail address" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
           </div>
 
+          <div>
+            <label>Avatar</label><br>
+            <input type="file" ref="file">
+          </div>
+
           <template v-if="errors.length > 0">
             <div class="bg-red-300 text-white rounded-lg p-6">
               <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
@@ -58,7 +63,6 @@
         form: {
           email: this.userStrore.user.email,
           name: this.userStrore.user.name,
-          avatar: null,
         },
         errors: []
       }
@@ -71,8 +75,17 @@
         if(!this.form.name) this.errors.push('Your name is missing')
 
         if(this.errors.length === 0) {
+          let formData = new FormData()
+          formData.append('avatar', this.$refs.file.files[0])
+          formData.append('name', this.form.name)
+          formData.append('email', this.form.email)
+
           axios
-            .post('/api/editprofile/', this.form)
+            .post('/api/editprofile/', formData, {
+              headers: {
+                "Content-Type": "multipart/form-data"
+              }
+            })
             .then((res) => {
               if(res.data.message === 'information updated') {
                 this.toastStore.showToast(5000, 'The information was saved', 'bg-emerald-500')
@@ -81,6 +94,7 @@
                   id: this.userStrore.user.id,
                   name: this.form.name,
                   email: this.form.email,
+                  avatar: res.data.user.get_avatar
                 })
 
                 this.$router.back()

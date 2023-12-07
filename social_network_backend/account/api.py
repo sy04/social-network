@@ -10,7 +10,8 @@ def me(req):
   return JsonResponse({
     'id': req.user.id,
     'name': req.user.name,
-    'email': req.user.email
+    'email': req.user.email,
+    'avatar': req.user.get_avatar()
   })
 
 @api_view(['POST'])
@@ -30,9 +31,9 @@ def signup(req):
   if form.is_valid():
     form.save()
   else:
-    message = 'error'
+    message = form.errors.as_json()
 
-  return JsonResponse({'message': message})
+  return JsonResponse({'message': message}, safe=False)
 
 @api_view(['GET'])
 def friends(req, pk):
@@ -60,12 +61,17 @@ def editprofile(req):
   if User.objects.exclude(id=user.id).filter(email=email).exists():
     return JsonResponse({'message': 'email already exists'})
   else:
-    form = ProfileForms(req.data, instance=user)
+    form = ProfileForms(req.POST, req.FILES, instance=user)
 
     if form.is_valid():
       form.save()
 
-    return JsonResponse({'message': 'information updated'})
+    serializer = UserSerializer(user)
+
+    return JsonResponse({
+      'message': 'information updated',
+      'user': serializer.data
+    })
 
 @api_view(['POST'])
 def send_friendship_request(req, pk):

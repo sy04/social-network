@@ -98,6 +98,11 @@ import { RouterLink } from 'vue-router';
                 this.form.password1 = ''
                 this.form.password2 = ''
               } else {
+                const data = JSON.parse(res.data.message)
+                console.log(data)
+                for(const key in data) {
+                  this.errors.push(data[key][0].message)
+                }
                 this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'br-red-300')
               }
             })

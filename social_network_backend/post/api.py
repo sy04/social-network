@@ -55,7 +55,12 @@ def post_create(req):
     post.created_by = req.user
     post.save()
 
+    user = req.user
+    user.posts_count = user.posts_count + 1
+    user.save()
+
     serializer = PostSerializer(post)
+
 
     return JsonResponse(serializer.data, safe=False)
   else:
