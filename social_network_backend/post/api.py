@@ -112,6 +112,7 @@ def post_like(req, pk):
     post.likes.add(like)
     post.save()
 
+  if post.created_by != req.user:
     notification = create_notification(req, 'post_like', post_id=post.id)
 
     return JsonResponse({'message': 'like created'})
@@ -127,7 +128,8 @@ def post_create_comment(req, pk):
   post.comments_count = post.comments_count + 1
   post.save()
 
-  notification = create_notification(req, 'post_comment', post_id=post.id)
+  if post.created_by != req.user:
+    notification = create_notification(req, 'post_comment', post_id=post.id)
 
   serializer = CommentSerializer(comment)
 

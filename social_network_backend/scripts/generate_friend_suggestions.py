@@ -27,3 +27,5 @@ for user in users:
     for friendsfriend in friend.friends.all():
       if friendsfriend not in user.friends.all() and friendsfriend != user:
         user.people_may_you_know.add(friendsfriend)
+
+print('Generate Friend Suggestions')
