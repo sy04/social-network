@@ -62,7 +62,7 @@
         v-for="(post, index) in posts"
         v-bind="index"
       >
-        <FeedItem v-bind:post="post" />
+        <FeedItem v-bind:post="post" v-on:deletePost="deletePost" />
       </div>
     </div>
 
@@ -129,6 +129,9 @@ input[type='file'] {
       }
     },
     methods: {
+      deletePost(id) {
+        this.posts = this.posts.filter((post) => post.id !== id)
+      },
       onFileChange(e) {
         const file = e.target.files[0]
         this.url = URL.createObjectURL(file)

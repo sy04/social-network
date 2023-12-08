@@ -13,7 +13,7 @@
         v-for="(post, index) in posts"
         v-bind="index"
       >
-        <FeedItem v-bind:post="post" />
+        <FeedItem v-bind:post="post" v-on:deletePost="deletePost" />
       </div>
     </div>
 
@@ -75,7 +75,10 @@
           .catch((err) => {
             console.log('error', err)
           })
-      }
+      },
+      deletePost(id) {
+        this.posts = this.posts.filter((post) => post.id !== id)
+      },
     }
   }
 </script>
