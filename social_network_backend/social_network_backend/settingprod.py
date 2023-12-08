@@ -26,9 +26,9 @@ SECRET_KEY = 'django-insecure-ni9hq-jpry-(z3pv(pnt1lsn+sq+q6g8ea0di9^_y_w1)a)2-w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['api.sn.id']
 
-WEBSITE_URL = 'http://localhost:8000'
+WEBSITE_URL = 'http://api.sn.id'
 
 # Application definition
 
@@ -52,11 +52,11 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173"
+    "http://sn.id"
 ]
 
 CORS_TRUSTED_ORIGINS = [
-    "http://localhost:5173"
+    "http://sn.id"
 ]
 
 INSTALLED_APPS = [
