@@ -8,9 +8,13 @@ from .serializers import ConversationSerializer, ConversationMessageSerializer, 
 @api_view(['GET'])
 def conversation_list(req):
   conversations = Conversation.objects.filter(users__in=list([req.user]))
-  serializer = ConversationSerializer(conversations, many=True)
 
-  return JsonResponse(serializer.data, safe=False)
+  if conversations:
+    serializer = ConversationSerializer(conversations, many=True)
+
+    return JsonResponse(serializer.data, safe=False)
+  else:
+    return JsonResponse([], safe=False)
 
 @api_view(['GET'])
 def conversation_detail(req, pk):

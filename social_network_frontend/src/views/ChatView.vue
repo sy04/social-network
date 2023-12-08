@@ -1,6 +1,6 @@
 
 <template>
-  <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
+  <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4" v-if="conversations.length">
     <div class="main-left col-span-1">
         <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
             <div class="space-y-4">
@@ -15,7 +15,11 @@
                       v-for="user in conversation.users"
                       v-bind:key="user.id"
                     >
-                      <img :src="user.get_avatar" class="w-[40px] rounded-full">
+                      <img
+                        v-if="user.id !== userStore.user.id"
+                        :src="user.get_avatar"
+                        class="w-[40px] rounded-full"
+                      >
                       <p
                         class="text-xs font-bold"
                         v-if="user.id !== userStore.user.id"
@@ -83,6 +87,12 @@
       </div>
     </div>
   </div>
+
+  <div class="max-w-7xl mx-auto" v-else>
+    <p>
+      Empty Message. <RouterLink :to="{'name': 'search'}" class="underline">Find</RouterLink> people send direct message.
+    </p>
+  </div>
 </template>
 
 <script>
@@ -117,9 +127,11 @@
         axios
           .get('/api/chat/')
           .then((res) => {
-            this.conversations = res.data
-            if(this.conversations.length) this.activeConversation = this.conversations[0].id
-            this.getMessages()
+            if(res.data.length) {
+              this.conversations = res.data
+              if(this.conversations.length) this.activeConversation = this.conversations[0].id
+              this.getMessages()
+            }
           })
           .catch((err) => {
             console.log('error', error)
