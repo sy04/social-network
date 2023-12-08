@@ -8,6 +8,8 @@
           Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate.
           Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate.
         </p>
+
+        <RouterLink :to="{name: 'editpassword'}" class="underline">Edit Password</RouterLink>
       </div>
     </div>
     <div class="main-right">
@@ -21,6 +23,11 @@
           <div>
             <label>E-mail</label><br>
             <input type="email" v-model="form.email" placeholder="Your e-mail address" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+          </div>
+
+          <div>
+            <label>Avatar</label><br>
+            <input type="file" ref="file">
           </div>
 
           <template v-if="errors.length > 0">
@@ -42,57 +49,66 @@
   import axios from 'axios'
   import { useToastStore } from '@/stores/toast'
   import { useUserStore } from '@/stores/user'
+  import { RouterLink } from 'vue-router'
 
   export default {
     setup() {
-      const toastStore = useToastStore()
-      const userStrore = useUserStore()
+      const toastStore = useToastStore();
+      const userStrore = useUserStore();
 
       return {
         toastStore,
         userStrore
-      }
+      };
     },
     data() {
       return {
         form: {
           email: this.userStrore.user.email,
           name: this.userStrore.user.name,
-          avatar: null,
         },
         errors: []
-      }
+      };
     },
     methods: {
-      submitForm() {
-        this.errors = []
+        submitForm() {
+            this.errors = [];
 
-        if(!this.form.email) this.errors.push('Your email is missing')
-        if(!this.form.name) this.errors.push('Your name is missing')
+            if (!this.form.email) this.errors.push('Your email is missing');
+            if (!this.form.name) this.errors.push('Your name is missing');
 
-        if(this.errors.length === 0) {
-          axios
-            .post('/api/editprofile/', this.form)
-            .then((res) => {
-              if(res.data.message === 'information updated') {
-                this.toastStore.showToast(5000, 'The information was saved', 'bg-emerald-500')
-
-                this.userStrore.setUserInfo({
-                  id: this.userStrore.user.id,
-                  name: this.form.name,
-                  email: this.form.email,
+            if (this.errors.length === 0) {
+              let formData = new FormData();
+              formData.append('avatar', this.$refs.file.files[0]);
+              formData.append('name', this.form.name);
+              formData.append('email', this.form.email);
+              axios
+                .post('/api/editprofile/', formData, {
+                  headers: {
+                    "Content-Type": "multipart/form-data"
+                  }
                 })
-
-                this.$router.back()
-              } else {
-                this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'br-red-300')
-              }
-            })
-            .catch((err) => {
-              console.log(err)
-            })
+                .then((res) => {
+                  if (res.data.message === 'information updated') {
+                    this.toastStore.showToast(5000, 'The information was saved', 'bg-emerald-500');
+                    this.userStrore.setUserInfo({
+                      id: this.userStrore.user.id,
+                      name: this.form.name,
+                      email: this.form.email,
+                      avatar: res.data.user.get_avatar
+                    });
+                    this.$router.back();
+                  }
+                  else {
+                    this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'br-red-300');
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
         }
-      }
-    }
-  }
+    },
+    components: { RouterLink }
+}
 </script>

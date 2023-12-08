@@ -76,18 +76,19 @@ import { RouterLink } from 'vue-router';
           await axios
             .post('/api/login/', this.form)
             .then((res) => {
-              console.log(res.data)
               this.userStore.setToken(res.data)
               axios.defaults.headers.common['Authorization'] = "Bearer " + res.data.access
             })
             .catch((err) => {
               console.log('error', err)
+              this.errors.push('The email or password is incorrect! or the user is not activated!')
             })
+        }
 
+        if(this.errors.length === 0) {
           await axios
             .get('/api/me/')
             .then((res) => {
-              console.log(res.data)
               this.userStore.setUserInfo(res.data)
               this.$router.push('/feed')
             })

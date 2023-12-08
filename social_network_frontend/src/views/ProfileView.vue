@@ -2,7 +2,7 @@
   <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
     <div class="main-left col-span-1">
       <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
-        <img src="https://i.pravatar.cc/300?img=70" class="mb-6 rounded-full">
+        <img :src="user.get_avatar" class="mb-6 rounded-full">
         <p><strong>{{ user.name }}</strong></p>
 
         <div class="mt-6 flex space-x-8 justify-around" v-if="user.id">
@@ -14,7 +14,7 @@
           <button
             class="inline-block py-5 px-3 bg-purple-600 text-xs text-white rounded-lg"
             @click="sendFriendshipRequest"
-            v-if="userStore.user.id !== user.id"
+            v-if="userStore.user.id !== user.id && cant_send_friendship_request"
           >
             Send Friendship Request
           </button>
@@ -51,16 +51,10 @@
         class="bg-white border border-gray-200 rounded-lg"
         v-if="userStore.user.id === user.id"
       >
-        <form v-on:submit.prevent="submitForm" method="post">
-          <div class="p-4">  
-            <textarea v-model="body" class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking about?"></textarea>
-          </div>
-  
-          <div class="p-4 border-t border-gray-100 flex justify-between">
-            <a href="#" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg">Attach image</a>
-            <button class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Post</button>
-          </div>
-        </form>
+        <FeedForm
+          v-bind:user="user"
+          v-bind:posts="posts"
+        />
       </div>
 
       <div
@@ -68,7 +62,7 @@
         v-for="(post, index) in posts"
         v-bind="index"
       >
-        <FeedItem v-bind:post="post" />
+        <FeedItem v-bind:post="post" v-on:deletePost="deletePost" />
       </div>
     </div>
 
@@ -79,14 +73,21 @@
   </div>
 </template>
 
+<style>
+input[type='file'] {
+  display: none;
+}
+</style>
+
 <script>
   import axios from 'axios'
   import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue';
   import Trends from '../components/Trends.vue';
   import FeedItem from '../components/FeedItem.vue';
+  import FeedForm from '../components/FeedForm.vue';
   import { useUserStore } from '@/stores/user'
   import { useToastStore } from '@/stores/toast'
-import { RouterLink } from 'vue-router';
+  import { RouterLink } from 'vue-router';
 
   export default {
     name: 'ProfileView',
@@ -103,6 +104,7 @@ import { RouterLink } from 'vue-router';
     PeopleYouMayKnow,
     Trends,
     FeedItem,
+    FeedForm,
     RouterLink
 },
     data() {
@@ -111,7 +113,7 @@ import { RouterLink } from 'vue-router';
         user: {
           id: ''
         },
-        body: ''
+        cant_send_friendship_request: null
       }
     },
     mounted() {
@@ -127,6 +129,13 @@ import { RouterLink } from 'vue-router';
       }
     },
     methods: {
+      deletePost(id) {
+        this.posts = this.posts.filter((post) => post.id !== id)
+      },
+      onFileChange(e) {
+        const file = e.target.files[0]
+        this.url = URL.createObjectURL(file)
+      },
       sendDirectMessage() {
         axios
           .get(`/api/chat/${this.$route.params.id}/get-or-create/`)
@@ -141,7 +150,7 @@ import { RouterLink } from 'vue-router';
         axios
           .post(`/api/friends/${this.$route.params.id}/request/`)
           .then((res) => {
-            console.log('data', res.data)
+            this.cant_send_friendship_request = false
             if(res.data.message === 'request already sent') {
                 this.toastStore.showToast(5000, 'The request has already been sent!', 'bg-red-300')
             } else {
@@ -158,24 +167,10 @@ import { RouterLink } from 'vue-router';
           .then((res) => {
             this.posts = res.data.posts
             this.user = res.data.user
+            this.cant_send_friendship_request = res.data.cant_send_friendship_request
           })
           .catch((err) => {
             console.log('error', err.message)
-          })
-      },
-      submitForm() {
-        axios
-          .post('/api/posts/create/', {
-            'body': this.body
-          })
-          .then((res) => {
-            console.log('data', res.data)
-
-            this.posts.unshift(res.data)
-            this.body = ''
-          })
-          .catch((err) => {
-            console.log('error', err)
           })
       },
       logout() {

@@ -2,7 +2,7 @@
   <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
     <div class="main-left col-span-1">
       <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
-        <img src="https://i.pravatar.cc/300?img=70" class="mb-6 rounded-full">
+        <img :src="user.get_avatar" class="mb-6 rounded-full">
         <p><strong>{{ user.name }}</strong></p>
         <div class="mt-6 flex space-x-8 justify-around">
           <p class="text-xs text-gray-500">{{ user.friends_count }} friends</p>
@@ -21,7 +21,7 @@
         v-for="friendshipRequests in friendshipRequests"
         v-bind:key="friendshipRequests.id"
       >
-        <img src="https://i.pravatar.cc/100?img=70" class="mb-6 mx-auto rounded-full">
+        <img :src="friendshipRequests.created_by.get_avatar" class="mb-6 mx-auto rounded-full">
         <p>
           <strong>
             <RouterLink :to="{name: 'profile', params: {'id': friendshipRequests.created_by.id}}">
@@ -50,7 +50,7 @@
           v-for="user in friends"
           v-bind:key="user.id"
         >
-          <img src="https://i.pravatar.cc/300?img=70" class="mb-6 rounded-full">
+          <img :src="user.get_avatar" class="mb-6 rounded-full">
           <p>
             <strong>
               <RouterLink :to="{name: 'profile', params: {'id': user.id}}">

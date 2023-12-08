@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.db import models
 from django.utils import timezone
@@ -36,6 +37,8 @@ class User(AbstractBaseUser, PermissionsMixin):
   friends = models.ManyToManyField('self')
   friends_count = models.IntegerField(default=0)
 
+  people_may_you_know = models.ManyToManyField('self')
+
   posts_count = models.IntegerField(default=0)
 
   is_active = models.BooleanField(default=True)
@@ -50,6 +53,12 @@ class User(AbstractBaseUser, PermissionsMixin):
   USERNAME_FIELD = 'email'
   EMAIL_FIELD = 'email'
   REQUIRED_FIELDS = []
+
+  def get_avatar(self):
+    if self.avatar:
+      return settings.WEBSITE_URL + self.avatar.url
+    else:
+      return 'https://picsum.photos/200/200'
 
 class FriendshipRequest(models.Model):
   SENT = 'sent'
