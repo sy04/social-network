@@ -15,7 +15,7 @@
 
 **notes**
 * Before migrating the database, ensure that you have created a new database named "social_network." Then, modify the database credentials inside social_network_backend/social_network_backend/settings.py.
-
+```python
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -26,7 +26,7 @@
             'PORT': '5432',
         }
     }
-
+```
 * If the migration fails, and you receive a "no changes detected" message from makemigrations, attempt to execute makemigrations manually:
     - python manage.py makemigrations account
     - python manage.py makemigrations chat
