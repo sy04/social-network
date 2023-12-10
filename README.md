@@ -6,6 +6,7 @@
 - pip install -r requirements.txt
 - python manage.py makemigrations
 - python manage.py migrate
+- python seeder/run_seeder.py **(optional)**
 - python manage.py runserver
 
 **frontend**
