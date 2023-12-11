@@ -69,6 +69,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'log_viewer',
+    'drf_yasg',
 
     'account',
     'post',
@@ -166,3 +168,123 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+FORMATTERS = {
+    "verbose": {
+        "format": "{levelname} {asctime:s} {threadName} {thread:d} {module} {filename} {lineno:d} {name} {funcName} {process:d} {message}",
+        "style": "{",
+    },
+    "simple": {
+        "format": "{levelname} {asctime:s} {module} {filename} {lineno:d} {funcName} {message}",
+        "style": "{",
+    },
+}
+
+# Handler untuk file keseluruhan
+all_handler = {
+    "class": "logging.handlers.RotatingFileHandler",
+    "filename": f"{BASE_DIR}/logs/all.log",
+    "mode": "a",
+    "encoding": "utf-8",
+    "formatter": "verbose",
+    "backupCount": 5,
+    "maxBytes": 1024 * 1024 * 5,  # 5 MB
+}
+
+debug_handler = {
+    "class": "logging.handlers.RotatingFileHandler",
+    "filename": f"{BASE_DIR}/logs/debug.log",
+    "mode": "a",
+    "encoding": "utf-8",
+    "formatter": "verbose",
+    "backupCount": 5,
+    "maxBytes": 1024 * 1024 * 5,  # 5 MB
+    "level": "DEBUG",
+}
+
+info_handler = {
+    "class": "logging.handlers.RotatingFileHandler",
+    "filename": f"{BASE_DIR}/logs/info.log",
+    "mode": "a",
+    "encoding": "utf-8",
+    "formatter": "verbose",
+    "backupCount": 5,
+    "maxBytes": 1024 * 1024 * 5,  # 5 MB
+    "level": "INFO",
+}
+
+warning_handler = {
+    "class": "logging.handlers.RotatingFileHandler",
+    "filename": f"{BASE_DIR}/logs/warning.log",
+    "mode": "a",
+    "encoding": "utf-8",
+    "formatter": "verbose",
+    "backupCount": 5,
+    "maxBytes": 1024 * 1024 * 5,  # 5 MB
+    "level": "WARNING",
+}
+
+error_handler = {
+    "class": "logging.handlers.RotatingFileHandler",
+    "filename": f"{BASE_DIR}/logs/error.log",
+    "mode": "a",
+    "encoding": "utf-8",
+    "formatter": "verbose",
+    "backupCount": 5,
+    "maxBytes": 1024 * 1024 * 5,  # 5 MB
+    "level": "ERROR",
+}
+
+critical_handler = {
+    "class": "logging.handlers.RotatingFileHandler",
+    "filename": f"{BASE_DIR}/logs/critical.log",
+    "mode": "a",
+    "encoding": "utf-8",
+    "formatter": "verbose",
+    "backupCount": 5,
+    "maxBytes": 1024 * 1024 * 5,  # 5 MB
+    "level": "CRITICAL",
+}
+
+# Kumpulan handler
+HANDLERS = {
+    "console_handler": {
+        "class": "logging.StreamHandler",
+        "formatter": "simple",
+    },
+    "all_handler": all_handler,
+    "debug_handler": debug_handler,
+    "info_handler": info_handler,
+    "warning_handler": warning_handler,
+    "error_handler": error_handler,
+    "critical_handler": critical_handler,
+}
+
+LOGGERS = {
+    "django": {
+        "handlers": [
+            "console_handler",
+            "all_handler",
+            "debug_handler",
+            "info_handler",
+            "error_handler",
+            "warning_handler",
+            "critical_handler"
+        ],
+        "level": "INFO",
+        "propagate": False,
+    },
+    "django.request": {
+        "handlers": ["error_handler"],
+        "level": "ERROR",
+        "propagate": False,
+    },
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": FORMATTERS,
+    "handlers": HANDLERS,
+    "loggers": LOGGERS,
+}

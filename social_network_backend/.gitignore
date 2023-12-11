@@ -55,3 +55,4 @@ migrations/
 db.sqlite3
 
 media/
+logs/
