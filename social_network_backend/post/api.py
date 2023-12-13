@@ -1,33 +1,78 @@
 from django.db.models import Q
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework import status
 
 from account.models import User
 from account.serializers import UserSerializer
 from notification.utils import create_notification
 
-from .forms import PostForm, AttachmentForm
+from .forms import PostForm, AttachmentForm, PostListParams
 from .models import Post, Like, Comment, Trend
 from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer, TrendSerializer
 
 from account.models import FriendshipRequest
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
+@swagger_auto_schema(
+    method='get',
+    manual_parameters=[
+        openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
+        openapi.Parameter('limit', openapi.IN_QUERY, description="Number of items per page", type=openapi.TYPE_INTEGER),
+    ]
+)
 @api_view(['GET'])
 def post_list(req):
-  user_ids = [req.user.id]
+    params = PostListParams(
+      page=int(req.GET.get('page', 1)),
+      limit=int(req.GET.get('limit', 10))
+    )
 
-  for user in req.user.friends.all():
-    user_ids.append(user.id)
+    user_ids = [req.user.id]
 
-  posts = Post.objects.filter(created_by_id__in=list(user_ids))
-  trend = req.GET.get('trend', '')
+    for user in req.user.friends.all():
+        user_ids.append(user.id)
 
-  if trend:
-    posts = posts.filter(body__icontains='#' + trend).filter(is_private=False)
+    posts = Post.objects.filter(created_by_id__in=list(user_ids))
+    trend = req.GET.get('trend', '')
 
-  serializer = PostSerializer(posts, many=True)
+    if trend:
+        posts = posts.filter(body__icontains='#' + trend).filter(is_private=False)
 
-  return JsonResponse(serializer.data, safe=False)
+    paginator = PageNumberPagination()
+    paginator.page = params.page
+    paginator.page_size = params.limit
+    paginate_posts = paginator.paginate_queryset(posts, req)  # Provide the request object here
+
+    count = posts.count()
+    page_count = paginator.page.paginator.num_pages
+
+    sl_no = 0 if paginator.page.number == 1 else (paginator.page.number - 1) * paginator.page_size
+
+    paginator_data = {
+        'itemCount': count,
+        'limit': paginator.page_size,
+        'pageCount': page_count,
+        'page': paginator.page.number,
+        'slNo': sl_no + 1,
+        'hasPrevPage': paginator.page.has_previous(),
+        'hasNextPage': paginator.page.has_next(),
+        'prevPage': paginator.page.previous_page_number() if paginator.page.has_previous() else None,
+        'nextPage': paginator.page.next_page_number() if paginator.page.has_next() else None,
+    }
+
+    serializer = PostSerializer(paginate_posts, many=True)
+
+    result = {
+        'posts': serializer.data if count > 0 else [],
+        'paginator': paginator_data
+    }
+
+    return Response(result, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def post_detail(req, pk):

@@ -27,3 +27,8 @@ class AttachmentForm(ModelForm):
           if not avatar.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
               raise forms.ValidationError("Invalid file format. Please upload a valid image file.")
       return avatar
+
+class PostListParams:
+  def __init__(self, page: int = 1, limit: int = 10) -> None:
+    self.page = page
+    self.limit = limit
