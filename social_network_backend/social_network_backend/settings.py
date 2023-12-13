@@ -9,9 +9,13 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import os
 
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,14 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ni9hq-jpry-(z3pv(pnt1lsn+sq+q6g8ea0di9^_y_w1)a)2-w'
+SECRET_KEY = "django-insecure-ni9hq-jpry-(z3pv(pnt1lsn+sq+q6g8ea0di9^_y_w1)a)2-w"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-WEBSITE_URL = 'http://localhost:8000'
+WEBSITE_URL = os.getenv("WEBSITE_URL")
 
 # Application definition
 
@@ -47,9 +51,9 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 AUTH_USER_MODEL = 'account.User'
 
 SIMPLE_SWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=180),
-    'ROTATE_REFRESH_TOKENS': False
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=int(os.getenv("REFRESH_TOKEN_EXPIRED"))),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=int(os.getenv("TOKEN_EXPIRED"))),
+    'ROTATE_REFRESH_TOKENS': bool(os.getenv("ROTATE_REFRESH_TOKENS", False))
 }
 
 REST_FRAMEWORK = {
@@ -61,13 +65,9 @@ REST_FRAMEWORK = {
     )
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173"
-]
-
-CORS_TRUSTED_ORIGINS = [
-    "http://localhost:5173"
-]
+print(os.getenv("CORS_ALLOWED_ORIGINS"))
+CORS_ALLOWED_ORIGINS = [allowed for allowed in os.getenv("CORS_ALLOWED_ORIGINS").split(",") if allowed]
+CORS_TRUSTED_ORIGINS = [trusted for trusted in os.getenv("CORS_TRUSTED_ORIGINS").split(",") if trusted]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -127,11 +127,11 @@ WSGI_APPLICATION = 'social_network_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'social_network',
-        'USER': 'pgadmin',
-        'PASSWORD': 'secure_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv("DATABASE_NAME"),
+        'USER': os.getenv("DATABASE_USER"),
+        'PASSWORD': os.getenv("DATABASE_PASSWORD"),
+        'HOST': os.getenv("DATABASE_HOST"),
+        'PORT': os.getenv("DATABASE_PORT"),
     }
 }
 
@@ -170,9 +170,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+STATIC_URL = os.getenv("STATIC_URL")
+MEDIA_URL = os.getenv("MEDIA_URL")
+MEDIA_ROOT = BASE_DIR / MEDIA_URL.rstrip('/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
