@@ -15,16 +15,6 @@ from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer
 
 from account.models import FriendshipRequest
 
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
-
-@swagger_auto_schema(
-    method='get',
-    manual_parameters=[
-        openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
-        openapi.Parameter('limit', openapi.IN_QUERY, description="Number of items per page", type=openapi.TYPE_INTEGER),
-    ]
-)
 @api_view(['GET'])
 def post_list(req):
     params = PostListParams(

@@ -78,6 +78,7 @@ def my_friendship_suggestions(req):
 
   return JsonResponse(serializer.data, safe=False)
 
+
 @api_view(['POST'])
 def editprofile(req):
   user = req.user

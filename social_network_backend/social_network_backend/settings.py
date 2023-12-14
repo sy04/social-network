@@ -36,16 +36,6 @@ WEBSITE_URL = os.getenv("WEBSITE_URL")
 
 # Application definition
 
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-        },
-    }
-}
-
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 AUTH_USER_MODEL = 'account.User'
@@ -80,7 +70,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'log_viewer',
-    'drf_yasg',
 
     'account',
     'post',
