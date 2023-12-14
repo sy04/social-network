@@ -8,7 +8,7 @@ from account.views import activateemail
 from rest_framework import permissions
 
 urlpatterns = [
-    path('api/auth/', include('account.urls')),
+    path('api/', include('account.urls')),
     path('api/posts/', include('post.urls')),
     path('api/search/', include('search.urls')),
     path('api/chat/', include('chat.urls')),
