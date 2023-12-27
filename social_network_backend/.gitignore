@@ -55,3 +55,7 @@ migrations/
 db.sqlite3
 
 media/
+logs/
+
+# Environment
+social_network_backend/.env

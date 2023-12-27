@@ -5,6 +5,8 @@ from django.urls import path, include
 
 from account.views import activateemail
 
+from rest_framework import permissions
+
 urlpatterns = [
     path('api/', include('account.urls')),
     path('api/posts/', include('post.urls')),

@@ -7,6 +7,8 @@ def activateemail(req):
   email = req.GET.get('email', '')
   id = req.GET.get('id', '')
 
+  print(email)
+
   if email and id:
     user = User.objects.get(id=id, email=email)
     user.is_active = True
