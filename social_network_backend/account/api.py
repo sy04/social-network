@@ -1,8 +1,13 @@
+import os
+
 from django.conf import settings
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from notification.utils import create_notification
 from .forms import SignupForms, ProfileForms
@@ -48,9 +53,7 @@ def signup(req):
     )
 
   else:
-    message = form.errors.as_json()
-
-  print(message)
+    message = form.errors
 
   return JsonResponse({'message': message}, safe=False)
 
@@ -88,9 +91,14 @@ def editprofile(req):
     return JsonResponse({'message': 'email already exists'})
   else:
     form = ProfileForms(req.POST, req.FILES, instance=user)
+    old_avatar_path = user.avatar.path if user.avatar else None
 
     if form.is_valid():
       form.save()
+
+      if old_avatar_path and user.avatar and old_avatar_path != user.avatar.path:
+        if os.path.exists(old_avatar_path):
+          os.remove(old_avatar_path)
 
     serializer = UserSerializer(user)
 
@@ -102,7 +110,6 @@ def editprofile(req):
 @api_view(['POST'])
 def editpassword(req):
   user = req.user
-  print(req.POST)
   form = PasswordChangeForm(data=req.POST, user=user)
 
   if form.is_valid():
@@ -110,7 +117,7 @@ def editpassword(req):
 
     return JsonResponse({'message': 'success'})
   else:
-    return JsonResponse({'message': form.errors.as_json()}, safe=False)
+    return JsonResponse({'message': form.errors}, safe=False)
 
 @api_view(['POST'])
 def send_friendship_request(req, pk):

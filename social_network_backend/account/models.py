@@ -1,4 +1,5 @@
 import uuid
+import os
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
@@ -29,11 +30,16 @@ class CustomUserManager(UserManager):
 
     return self._create_user(name, email, password, **extra_fields)
 
+def unique_filename(instance, filename):
+  ext = filename.split('.')[-1]
+  filename = f"{uuid.uuid4().hex}.{ext}"
+  return os.path.join('avatars', filename)
+
 class User(AbstractBaseUser, PermissionsMixin):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   email = models.EmailField(unique=True)
   name = models.CharField(max_length=255, blank=True, default='')
-  avatar = models.ImageField(upload_to='avatars', blank=True, null=True)
+  avatar = models.ImageField(upload_to=unique_filename, blank=True, null=True)
   friends = models.ManyToManyField('self')
   friends_count = models.IntegerField(default=0)
 

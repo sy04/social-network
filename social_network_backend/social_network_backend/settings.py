@@ -52,7 +52,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
 }
 
 print(os.getenv("CORS_ALLOWED_ORIGINS"))

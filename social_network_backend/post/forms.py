@@ -6,7 +6,7 @@ class PostForm(ModelForm):
   body = forms.CharField(
       required=True,
       error_messages={
-          'required': 'Name is required.',
+        'required': 'Body is required.',
       }
   )
 

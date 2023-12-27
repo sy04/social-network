@@ -1,4 +1,5 @@
 import uuid
+import os
 
 from django.conf import settings
 from django.db import models
@@ -22,9 +23,14 @@ class Comment(models.Model):
   def created_at_formatted(self):
     return timesince(self.created_at)
 
+def unique_filename(instance, filename):
+  ext = filename.split('.')[-1]
+  filename = f"{uuid.uuid4().hex}.{ext}"
+  return os.path.join('post_attachments', filename)
+
 class PostAttachment(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  image = models.ImageField(upload_to='post_attachments')
+  image = models.ImageField(upload_to=unique_filename)
   created_by = models.ForeignKey(User, related_name='post_attachments', on_delete=models.CASCADE)
 
   def get_image(self):

@@ -187,7 +187,7 @@ def post_report(req, pk):
   post.reported_by_users.add(req.user)
   post.save()
 
-  return JsonResponse({'message': 'post deleted'})
+  return JsonResponse({'message': 'post reported'})
 
 @api_view(['GET'])
 def get_trends(req):
